@@ -34,6 +34,7 @@ async function run() {
     // !database collection
     const userCollection = client.db('academixDb').collection('Users');
     const teacherCollection = client.db('academixDb').collection('Teachers');
+    const classColldection = client.db('academixDb').collection('Classes');
    
 
 
@@ -98,6 +99,19 @@ async function run() {
       })
 
       const result = await teacherCollection.updateOne(filter,updatedDoc);
+      res.send(result)
+    })
+
+    // ! class related api
+
+    app.post('/classes', async (req,res) => {
+        const signgleClass =  req.body;
+        const result = await classColldection.insertOne(signgleClass);
+        res.send(result);
+    })
+    
+    app.get('/classes', async (req,res) => {
+      const result = await classColldection.find().toArray()
       res.send(result)
     })
 

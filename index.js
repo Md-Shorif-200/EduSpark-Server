@@ -31,7 +31,28 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-    
+    // !database collection
+    const userCollection = client.db('academixDb').collection('Users');
+
+
+
+
+    // ! user related  Api
+
+    app.post('/users' , async(req,res) => {
+          const user = req.body;
+          const  result =  await userCollection.insertOne(user);
+          res.send(result)
+    })
+
+    app.get('/users', async(req,res) => {
+         const result = await userCollection.find().toArray();
+         res.send(result)
+    })
+
+
+
+
     
 
 

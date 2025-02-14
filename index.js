@@ -41,6 +41,13 @@ async function run() {
 
     app.post('/users' , async(req,res) => {
           const user = req.body;
+          // if user already sign up
+          const email = req.query.email;
+          const userAlradyExist = userCollection.findOne(email);
+          if(userAlradyExist){
+            return  res.send({meassage : 'u are already sign up. please sign in', insertedId : null});
+          }
+
           const  result =  await userCollection.insertOne(user);
           res.send(result)
     })

@@ -33,6 +33,8 @@ async function run() {
 
     // !database collection
     const userCollection = client.db('academixDb').collection('Users');
+    const teacherCollection = client.db('academixDb').collection('Teachers');
+   
 
 
 
@@ -42,8 +44,8 @@ async function run() {
     app.post('/users' , async(req,res) => {
           const user = req.body;
           // if user already sign up
-          const email = req.query.email;
-          const userAlradyExist = userCollection.findOne(email);
+          const query = {email : user.email};
+          const userAlradyExist = await userCollection.findOne(query);
           if(userAlradyExist){
             return  res.send({meassage : 'u are already sign up. please sign in', insertedId : null});
           }
@@ -70,6 +72,18 @@ async function run() {
        const result = await userCollection.updateOne(filter,updatedDoc);
        res.send(result)
 
+    })
+    // ! teacher related api
+
+    app.post('/teachers', async(req,res) => {
+       const teacher  = req.body;
+       const result = await teacherCollection.insertOne(teacher);
+       res.send(result)
+    })
+
+    app.get('/teachers', async(req,res) => {
+      const result = await teacherCollection.find().toArray();
+      res.send(result)
     })
 
 

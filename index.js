@@ -125,6 +125,14 @@ async function run() {
       res.send(result)
     })
 
+    // get single class data 
+    app.get('/classes/:id', async (req,res) => {
+       const id  = req.params.id;
+       const query = {_id : new ObjectId(id)};
+       const result = await classCollection.findOne(query);
+       res.send(result)
+    })
+
 
 
 

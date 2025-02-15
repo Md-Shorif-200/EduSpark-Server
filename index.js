@@ -34,7 +34,7 @@ async function run() {
     // !database collection
     const userCollection = client.db('academixDb').collection('Users');
     const teacherCollection = client.db('academixDb').collection('Teachers');
-    const classColldection = client.db('academixDb').collection('Classes');
+    const classCollection = client.db('academixDb').collection('Classes');
    
 
 
@@ -106,12 +106,22 @@ async function run() {
 
     app.post('/classes', async (req,res) => {
         const signgleClass =  req.body;
-        const result = await classColldection.insertOne(signgleClass);
+        const result = await classCollection.insertOne(signgleClass);
         res.send(result);
     })
     
     app.get('/classes', async (req,res) => {
-      const result = await classColldection.find().toArray()
+      const result = await classCollection.find().toArray()
+      res.send(result)
+    })
+
+    // delete classs from teacher  dashboard
+
+    app.delete('/classes/:id', async(req,res) => {
+      const id = req.params.id;
+      const query = {_id : new ObjectId(id)};
+
+      const result  = await classCollection.deleteOne(query);
       res.send(result)
     })
 

@@ -55,10 +55,27 @@ async function run() {
           res.send(result)
     })
 
-    app.get('/users', async(req,res) => {
+    app.get('/users', async(req,res) => { 
          const result = await userCollection.find().toArray();
          res.send(result)
     })
+
+//     app.patch('/users/:email', async(req,res) => {
+//       const email = req.params.email;
+//        console.log(email);
+//        const filter = {email : email};
+//        const updatedDoc = {
+//          $set : {
+//           role : 'teacher'
+//          }
+//        }
+//        const result = await userCollection.updateOne(filter,updatedDoc);
+//        res.send(result)
+       
+
+//  })
+
+    
 
     // update user role
 
@@ -74,6 +91,9 @@ async function run() {
        res.send(result)
 
     })
+
+    
+
     // ! teacher related api
 
     app.post('/teachers', async(req,res) => {
@@ -87,20 +107,20 @@ async function run() {
       res.send(result)
     })
 
-    app.patch('/teachers/:id' , async(req,res) => {
-      const id = req.params.id;
-      const filter = {_id : new ObjectId(id)};
+    // app.patch('/teachers/:id' , async(req,res) => {
+    //   const id = req.params.id;
+    //   const filter = {_id : new ObjectId(id)};
 
-      const updatedDoc = ({
-        $set : {
-          status : 'accepted',
-          role : 'teacher'
-        }
-      })
+    //   const updatedDoc = ({
+    //     $set : {
+    //       status : 'accepted',
+    //       role : 'teacher'
+    //     }
+    //   })
 
-      const result = await teacherCollection.updateOne(filter,updatedDoc);
-      res.send(result)
-    })
+    //   const result = await teacherCollection.updateOne(filter,updatedDoc);
+    //   res.send(result)
+    // })
 
     // ! class related api
 
@@ -128,9 +148,24 @@ async function run() {
     // get single class data 
     app.get('/classes/:id', async (req,res) => {
        const id  = req.params.id;
+        console.log(id);
+        
        const query = {_id : new ObjectId(id)};
        const result = await classCollection.findOne(query);
        res.send(result)
+    })
+    // update class status
+
+    app.patch('/classes/:id', async (req,res) => {
+      const id = req.params.id;
+      const filter = {_id : new ObjectId(id)};
+      const updatedDoc = {
+        $set : {
+          status : 'approved'
+        }
+      }
+      const  result = await classCollection.updateOne(filter,updatedDoc);
+      res.send(result)
     })
 
 

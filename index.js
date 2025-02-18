@@ -91,21 +91,49 @@ async function run() {
        res.send(result)
 
     })
+// manage user status and role
+    app.patch('/users/:email', async(req,res) => {
+      const  email = req.params.email;
+      const query = {email : email};
+      const user =  await userCollection.findOne(query);
+      const skills = req.body;
+
+      if(!user || user?.status === 'pending'){
+        return res.status(400)
+                  .send('you have already requested')
+      }
+
+      const updatedDoc = {
+         $set : {
+          status : 'pending',
+          skills : {
+            experience : skills.experience,
+                title : skills.title,
+            catagory : skills.catagory
+          }
+         }
+      }
+
+      const result = await userCollection.updateOne(query,updatedDoc);
+      res.send(result)
+
+       
+    })
 
     
 
     // ! teacher related api
 
-    app.post('/teachers', async(req,res) => {
-       const teacher  = req.body;
-       const result = await teacherCollection.insertOne(teacher);
-       res.send(result)
-    })
+    // app.post('/teachers', async(req,res) => {
+    //    const teacher  = req.body;
+    //    const result = await teacherCollection.insertOne(teacher);
+    //    res.send(result)
+    // })
 
-    app.get('/teachers', async(req,res) => {
-      const result = await teacherCollection.find().toArray();
-      res.send(result)
-    })
+    // app.get('/teachers', async(req,res) => {
+    //   const result = await teacherCollection.find().toArray();
+    //   res.send(result)
+    // })
 
     // app.patch('/teachers/:id' , async(req,res) => {
     //   const id = req.params.id;

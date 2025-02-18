@@ -120,6 +120,26 @@ async function run() {
        
     })
 
+   // get user role
+
+   app.get('/users/role/:email',async(req,res) => {
+      const email = req.params.email;
+       console.log(email);
+       
+      const result = await userCollection.findOne({email});
+       console.log(result);
+       
+      res.send({role : result?.role})
+   })
+
+
+    // manage teacher status and role
+
+    
+
+    // app.patch('/users/:teacher/:email', async(req,res) => {
+    //   const 
+    // })
     
 
     // ! teacher related api

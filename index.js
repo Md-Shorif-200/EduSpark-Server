@@ -132,14 +132,24 @@ async function run() {
       res.send({role : result?.role})
    })
 
-
     // manage teacher status and role
 
-    
+    app.patch('/users/teacher/:email', async(req,res) => {
+      const email = req.params.email;
+      const filter = {email : email};
 
-    // app.patch('/users/:teacher/:email', async(req,res) => {
-    //   const 
-    // })
+      const updatedDoc = {
+        $set : {
+          status : 'accepted',
+          role : 'teacher'
+        }
+      }
+      const result = await userCollection.updateOne(filter,updatedDoc);
+      res.send(result)
+    
+    })
+
+    
     
 
     // ! teacher related api

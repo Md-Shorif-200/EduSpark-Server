@@ -124,32 +124,65 @@ async function run() {
 
    app.get('/users/role/:email',async(req,res) => {
       const email = req.params.email;
-       console.log(email);
+    
        
       const result = await userCollection.findOne({email});
-       console.log(result);
+  
        
-      res.send({role : result?.role})
+      res.send({role : result?.role , status : result?.status})
    })
 
     // manage teacher status and role
 
-    app.patch('/users/teacher/:email', async(req,res) => {
+    app.patch('/users/teacher/confirm/:email', async(req,res) => {
       const email = req.params.email;
       const filter = {email : email};
-
-      const updatedDoc = {
-        $set : {
-          status : 'accepted',
-          role : 'teacher'
-        }
-      }
-      const result = await userCollection.updateOne(filter,updatedDoc);
-      res.send(result)
+   
+  const updatedDoc = {
+    $set : {
+      status : 'accepted',
+      role : 'teacher'
+    }
+  }
+   
+  const result = await userCollection.updateOne(filter,updatedDoc);
+         
+res.send(result)
     
     })
 
+    app.patch('/users/teacher/reject/:email', async(req,res) => {
+      const email = req.params.email;
+      const filter = {email : email};
+   
+  const updatedDoc = {
+    $set : {
+      status : 'rejected',
+      role : 'user'
+    }
+  }
+   
+  const result = await userCollection.updateOne(filter,updatedDoc);
+         
+res.send(result)
     
+    })
+
+    // manage rejected teacher request
+
+    app.patch('/users/reject/:email' , async(req,res) => {
+      const  email = req.params.email;
+      const filter = {email : email};
+      const updatedDoc = {
+        $set : {
+            status : 'pending',
+    role : 'user'
+        }
+      }
+
+      const result = await userCollection.updateOne(filter,updatedDoc);
+      res.send(result)
+    })
     
 
     // ! teacher related api

@@ -4,6 +4,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 require('dotenv').config()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 
 // middlewares 
@@ -35,7 +36,8 @@ async function run() {
     const userCollection = client.db('academixDb').collection('Users');
     const teacherCollection = client.db('academixDb').collection('Teachers');
     const classCollection = client.db('academixDb').collection('Classes');
-   
+    const paymentCollections = client.db('academixDb').collection('Payments');
+    
 
 
 
@@ -239,15 +241,25 @@ res.send(result)
     // get single class data 
     app.get('/classes/:id', async (req,res) => {
        const id  = req.params.id;
-        console.log(id);
+
+       if(!ObjectId.isValid(id)){
+        return res.status(404).send({error : 'invalid id format'})
+       }
         
        const query = {_id : new ObjectId(id)};
-       const result = await classCollection.findOne(query);
-       res.send(result)
-    })
-    // update class status
 
-    app.patch('/classes/:id', async (req,res) => {
+       try{
+         
+         const result = await classCollection.findOne(query);
+         res.send(result)
+       }catch(error){
+res.status(500).send({error : 'server error'})
+       }
+
+    })
+    // manage class status
+
+    app.patch('/classes/approve/:id', async (req,res) => {
       const id = req.params.id;
       const filter = {_id : new ObjectId(id)};
       const updatedDoc = {
@@ -258,6 +270,53 @@ res.send(result)
       const  result = await classCollection.updateOne(filter,updatedDoc);
       res.send(result)
     })
+// ------------------
+    app.patch('/classes/reject/:id', async(req,res) => {
+       const id = req.params.id;
+       const filter = {_id : new ObjectId(id)};
+
+       const updatedDoc = {
+        $set : {
+          status : 'rejected'
+        }
+       }
+
+       const result = await classCollection.updateOne(filter,updatedDoc);
+       res.send(result)
+    })
+
+    // ! payment intent 
+
+    app.post('/creat-payment-intent' , async(req,res) => {
+      const {courseFee} = req.body;
+      const amount = parseInt(courseFee * 100);
+  
+       
+
+      // creat a paymentIntent with the order amount and currency
+      const paymentIntent = await stripe.paymentIntents.create({
+            amount : amount,
+            currency : 'usd',
+            payment_method_types : [
+              "card"
+            ]
+      })
+
+      res.send({
+        clientSecret : paymentIntent.client_secret
+      })
+
+    })
+
+    app.post('/payments', async(req,res) => {
+        const payment = req.body;
+
+        const paymentResult = await paymentCollections.insertOne(payment);
+
+        res.send(paymentResult)
+    })
+
+
 
 
 

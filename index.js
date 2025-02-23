@@ -218,8 +218,8 @@ res.send(result)
     // ! class related api
 
     app.post('/classes', async (req,res) => {
-        const signgleClass =  req.body;
-        const result = await classCollection.insertOne(signgleClass);
+        const classes =  req.body;
+        const result = await classCollection.insertOne(classes);
         res.send(result);
     })
     
@@ -285,6 +285,25 @@ res.status(500).send({error : 'server error'})
        res.send(result)
     })
 
+    // update class information
+
+    app.patch('/classes/update/:id', async(req,res) => {
+       const id = req.params.id;
+       const updatedData = req.body;
+       const filter = {_id :  new ObjectId(id)};
+
+       const updatedDoc = {
+        $set : {
+            title : updatedData.title,
+            image : updatedData.image,
+            price : updatedData.price,
+            description : updatedData.description
+        }
+       }
+       const result = await classCollection.updateOne(filter,updatedDoc);
+       res.send(result)
+    })
+
     // ! payment intent 
 
     app.post('/creat-payment-intent' , async(req,res) => {
@@ -308,12 +327,18 @@ res.status(500).send({error : 'server error'})
 
     })
 
-    app.post('/payments', async(req,res) => {
+    app.post('/payments', async (req,res) => {
         const payment = req.body;
+    
+  
+        const result = await paymentCollections.insertOne(payment);
 
-        const paymentResult = await paymentCollections.insertOne(payment);
+        res.send(result)
+    })
 
-        res.send(paymentResult)
+    app.get('/payments', async(req,res) => {
+      const result = await paymentCollections.find().toArray();
+       res.send(result)
     })
 
 

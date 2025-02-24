@@ -37,6 +37,8 @@ async function run() {
     const teacherCollection = client.db('academixDb').collection('Teachers');
     const classCollection = client.db('academixDb').collection('Classes');
     const paymentCollections = client.db('academixDb').collection('Payments');
+    const assignmentsCollections = client.db('academixDb').collection('Assignments');
+    const SubmitedAsignmentCollections = client.db('academixDb').collection('Submited Assignment');
     
 
 
@@ -341,6 +343,44 @@ res.status(500).send({error : 'server error'})
        res.send(result)
     })
 
+    app.get('/payments/:id', async(req,res) => {
+       const id = req.params.id;
+       
+        
+        const query = {_id : new ObjectId(id)};
+        const result = await paymentCollections.findOne(query);
+
+         res.send(result)
+    })
+
+
+    // !Assignments related api
+
+    app.post('/assignments', async(req,res) => {
+               const assignmet = req.body;
+               const result = await assignmentsCollections.insertOne(assignmet);
+               res.send(result)
+    })
+
+    app.get('/assignments', async(req,res) => {
+      const result = await assignmentsCollections.find().toArray();
+      res.send(result)
+    })
+
+
+    // ! submited assignment related api
+
+    app.post('/submit-asignment', async (req,res) => {
+             const submission = req.body;
+             const result = await SubmitedAsignmentCollections.insertOne(submission);
+             res.send(result)  
+              })
+
+
+              app.get('/submit-asignment', async(req,res) => {
+                const result = await SubmitedAsignmentCollections.find().toArray();
+                res.send(result)
+              })
 
 
 

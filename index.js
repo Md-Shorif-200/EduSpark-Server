@@ -38,7 +38,8 @@ async function run() {
     const classCollection = client.db('academixDb').collection('Classes');
     const paymentCollections = client.db('academixDb').collection('Payments');
     const assignmentsCollections = client.db('academixDb').collection('Assignments');
-    const SubmitedAsignmentCollections = client.db('academixDb').collection('Submited Assignment');
+    const SubmitedAsignmentCollections = client.db('academixDb').collection('Submited-Assignment');
+    const feedbackCollections = client.db('academixDb').collection('Student-Feedbacks');
     
 
 
@@ -382,6 +383,22 @@ res.status(500).send({error : 'server error'})
                 res.send(result)
               })
 
+
+
+              // ! feedback related api
+
+              app.post('/feedback', async (req,res) => {
+                const studentFeedback = req.body;
+                const result = await feedbackCollections.insertOne(studentFeedback);
+                res.send(result)  
+                 })
+   
+   
+                 app.get('/feedback', async (req,res) => {
+          
+                  const result = await feedbackCollections.find().toArray()
+                  res.send(result)  
+                   })
 
 
 

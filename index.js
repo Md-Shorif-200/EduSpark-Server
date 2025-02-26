@@ -9,10 +9,13 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 // middlewares 
 app.use(express.json())
-app.use(cors())
-
-
-
+app.use(cors({
+  origin : [
+ 'http://localhost:5173'
+  // 'https://academix-e460f.firebaseapp.com',
+  // 'https://academix-e460f.web.app',
+  ]
+}))
 
 
 // !mongodb database
@@ -65,22 +68,6 @@ async function run() {
          res.send(result)
     })
 
-//     app.patch('/users/:email', async(req,res) => {
-//       const email = req.params.email;
-//        console.log(email);
-//        const filter = {email : email};
-//        const updatedDoc = {
-//          $set : {
-//           role : 'teacher'
-//          }
-//        }
-//        const result = await userCollection.updateOne(filter,updatedDoc);
-//        res.send(result)
-       
-
-//  })
-
-    
 
     // update user role
 
@@ -96,6 +83,16 @@ async function run() {
        res.send(result)
 
     })
+
+    delete user 
+    app.delete('/users/:id', async(req,res) => { 
+      const id = req.params.id;
+      const query = {_id : new ObjectId(id)};
+      const result = await userCollection.deleteOne(query)
+      res.send(result)
+ })
+
+    
 // manage user status and role
     app.patch('/users/:email', async(req,res) => {
       const  email = req.params.email;
@@ -190,34 +187,9 @@ res.send(result)
     })
     
 
-    // ! teacher related api
 
-    // app.post('/teachers', async(req,res) => {
-    //    const teacher  = req.body;
-    //    const result = await teacherCollection.insertOne(teacher);
-    //    res.send(result)
-    // })
 
-    // app.get('/teachers', async(req,res) => {
-    //   const result = await teacherCollection.find().toArray();
-    //   res.send(result)
-    // })
-
-    // app.patch('/teachers/:id' , async(req,res) => {
-    //   const id = req.params.id;
-    //   const filter = {_id : new ObjectId(id)};
-
-    //   const updatedDoc = ({
-    //     $set : {
-    //       status : 'accepted',
-    //       role : 'teacher'
-    //     }
-    //   })
-
-    //   const result = await teacherCollection.updateOne(filter,updatedDoc);
-    //   res.send(result)
-    // })
-
+    
     // ! class related api
 
     app.post('/classes', async (req,res) => {

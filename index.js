@@ -11,9 +11,9 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 app.use(express.json())
 app.use(cors({
   origin : [
- 'http://localhost:5173'
-  // 'https://academix-e460f.firebaseapp.com',
-  // 'https://academix-e460f.web.app',
+ 'http://localhost:5173',
+  'https://academix-e460f.firebaseapp.com',
+  'https://academix-e460f.web.app'
   ]
 }))
 
@@ -33,7 +33,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     // !database collection
     const userCollection = client.db('academixDb').collection('Users');
@@ -202,6 +202,21 @@ res.send(result)
       const result = await classCollection.find().toArray()
       res.send(result)
     })
+// update totalEnrollments 
+    app.patch('/classes/:id', async(req,res) => {
+      const id = req.params.id;
+      // const enrollment = req.body;
+      //  console.log(enrollment);
+       
+      const filter = {_id : new ObjectId(id)};
+      const updatedDoc = {
+        $inc : {
+          totalEnrollments  : 1
+        }
+      }
+      const result = await classCollection.updateOne(filter,updatedDoc);
+      res.send(result)
+    })
 
     // delete classs from teacher  dashboard
 
@@ -278,6 +293,10 @@ res.status(500).send({error : 'server error'})
        const result = await classCollection.updateOne(filter,updatedDoc);
        res.send(result)
     })
+
+ 
+
+
 
     // ! payment intent 
 
@@ -357,7 +376,7 @@ res.status(500).send({error : 'server error'})
 
 
 
-              // ! feedback related api
+   // ! feedback related api
 
               app.post('/feedback', async (req,res) => {
                 const studentFeedback = req.body;
@@ -380,8 +399,8 @@ res.status(500).send({error : 'server error'})
 
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();

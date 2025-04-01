@@ -18,7 +18,7 @@ app.use(cors({
 }))
 
 
-// !mongodb database
+// !mongodb link
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.56yvv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -33,7 +33,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
+    await client.connect();
 
     // !database collection
     const userCollection = client.db('academixDb').collection('Users');
@@ -197,10 +197,36 @@ res.send(result)
         const result = await classCollection.insertOne(classes);
         res.send(result);
     })
-    
+
+
+    // get all classes from database  
     app.get('/classes', async (req,res) => {
-      const result = await classCollection.find().toArray()
+       try {
+        const search = req.query.search || '';
+        const sort = req.query.sort || '';
+        const filter = req.query.filter || '';
+
+        
+        let options = {};
+        if(sort){
+          options = { sort : {price : sort == 'asc' ? 1 : -1}}
+        }
+
+
+  let query =   {
+    title : {
+      $regex: search ,$options: 'i',
+    },
+  } 
+
+  if(filter) {query.title = filter}
+      const result = await classCollection.find(query,options).toArray()
       res.send(result)
+       }catch (error) {
+        res.status(500).send({ message: 'Server Error' });
+
+        
+       }
     })
 // update totalEnrollments 
     app.patch('/classes/:id', async(req,res) => {
@@ -295,6 +321,32 @@ res.status(500).send({error : 'server error'})
     })
 
  
+
+    // delete class from database 
+    app.delete('/classes/:id', async(req,res) => {
+         try {
+          const id = req.params.id; 
+           console.log(id);
+           
+               //  cheack if id is valid
+          if(!ObjectId.isValid(id)){
+           return res.status(400).send({success:false , message : 'invalid class id'});
+          }
+          const query = {_id : new ObjectId(id)};
+
+          const result = await classCollection.deleteOne(query);
+              console.log('delete result', result);
+              
+          if (result.deletedCount === 0) {
+            return res.status(404).json({ success: false, message: "Class not found" });
+        }
+
+        res.status(200).send({success: true, message : 'class deleted successfully'});
+
+         } catch (error) {
+          res.status(500).json({ success: false, message: "Internal server error" });
+         }
+    })
 
 
 
@@ -399,8 +451,8 @@ res.status(500).send({error : 'server error'})
 
 
     // Send a ping to confirm a successful connection
-    // await client.db("admin").command({ ping: 1 });
-    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();

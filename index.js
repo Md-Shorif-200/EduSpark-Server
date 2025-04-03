@@ -231,17 +231,39 @@ res.send(result)
 // update totalEnrollments 
     app.patch('/classes/:id', async(req,res) => {
       const id = req.params.id;
-      // const enrollment = req.body;
-      //  console.log(enrollment);
-       
+        const {studentEmail} = req.body;
+      
+         
+      const filterdEmail = {email : studentEmail}
       const filter = {_id : new ObjectId(id)};
+      
       const updatedDoc = {
         $inc : {
           totalEnrollments  : 1
         }
+      };
+
+      const roleUpdate = {
+        $set : {
+          role : 'student'
+        }
       }
-      const result = await classCollection.updateOne(filter,updatedDoc);
-      res.send(result)
+    try {
+        // প্রথমে ক্লাস আপডেট
+        const classResult = await classCollection.updateOne(filter,updatedDoc);
+
+
+        // তারপর ইউজার আপডেট
+        const userResult = await userCollection.updateOne(filterdEmail, roleUpdate);
+
+        res.send({ classResult, userResult });
+    } catch (error) {
+        res.status(500).send({ message: "Error updating data", error });
+    }
+
+
+
+
     })
 
     // delete classs from teacher  dashboard

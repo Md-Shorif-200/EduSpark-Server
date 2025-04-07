@@ -122,6 +122,34 @@ async function run() {
        
     })
 
+    // update user profile data
+
+    app.patch('/api/user/update-profile/:email', async(req,res) => {
+          const email = req.params.email;
+          const emailQuery = {email : email};
+          const userData = req.body;
+
+            // Check if req.body is empty
+  if (Object.keys(userData).length === 0) {
+    return res.status(400).send({ success: false, message: 'No data provided for update' });
+  }
+
+         const updatedData = {
+          $set : {
+            image : userData.image,
+            phoneNumber : userData.phoneNumber,
+            userAddress : userData.address
+          }
+         }
+
+         const result = await userCollection.updateOne(emailQuery,updatedData);
+
+         res.send(result)
+  
+
+
+    })
+
    // get user role
 
    app.get('/users/role/:email',async(req,res) => {

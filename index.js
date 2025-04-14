@@ -43,6 +43,7 @@ async function run() {
     const assignmentsCollections = client.db('academixDb').collection('Assignments');
     const SubmitedAsignmentCollections = client.db('academixDb').collection('Submited-Assignment');
     const feedbackCollections = client.db('academixDb').collection('Student-Feedbacks');
+    const wishListCollectios = client.db('academixDb').collection('WhisLists')
     
 
 
@@ -97,12 +98,14 @@ async function run() {
     app.patch('/users/:email', async(req,res) => {
       const  email = req.params.email;
       const query = {email : email};
-      const user =  await userCollection.findOne(query);
       const skills = req.body;
+      console.log(skills);
+      
+
+      const user =  await userCollection.findOne(query); // find specific user 
 
       if(!user || user?.status === 'pending'){
-        return res.status(400)
-                  .send('you have already requested')
+        return res.status(400).send('you have already requested')
       }
 
       const updatedDoc = {
@@ -493,6 +496,26 @@ res.status(500).send({error : 'server error'})
                   res.send(result)  
                    })
 
+                
+                   //  ! whislist related api
+                   
+                   app.post('/api/whislists' , async(req,res) => {
+                      const  whislistData = req.body;
+
+                      const result = await wishListCollectios.insertOne(whislistData);
+
+                      res.send(result)
+                   })
+
+
+                   app.get('/api/whislists' , async(req,res) => {
+                  
+
+                    const result = await wishListCollectios.find().toArray()
+
+                    res.send(result)
+                 })
+                
 
 
 

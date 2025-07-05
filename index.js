@@ -12,8 +12,6 @@ app.use(express.json())
 app.use(cors({
   origin : [
  'http://localhost:5173',
-  'https://academix-e460f.firebaseapp.com',
-  'https://academix-e460f.web.app'
   ]
 }))
 
